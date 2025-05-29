@@ -15,11 +15,32 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
+from rest_framework.authtoken.views import obtain_auth_token
 from django.urls import path, include
+from rest_framework import routers
+from usuario.views import UsuarioViewSet, GrupoViewSet, PermissaoViewSet, GrupoPermissaoViewSet, UsuarioGrupoViewSet
+from fluxoAprovacao.views import FluxoAprovacaoViewSet, EtapaViewSet, EtapaFluxoViewSet
+from esteira.views import (
+    EsteiraViewSet,
+    EsteiraFluxoViewSet,
+)
+from usuario.views import GrupoPermissaoListView
+
+router = routers.DefaultRouter()
+router.register('usuario', UsuarioViewSet, basename='Usuarios')
+router.register('grupo', GrupoViewSet, basename='Grupos')
+router.register('permissao', PermissaoViewSet, basename='Permissoes')
+router.register('grupo-permissao', GrupoPermissaoViewSet, basename='GrupoPermissao')
+router.register('usuario-grupo', UsuarioGrupoViewSet, basename='UsuarioGrupo')
+router.register('fluxo-aprovacao', FluxoAprovacaoViewSet, basename='FluxosAprovacao')
+router.register('etapa', EtapaViewSet, basename='Etapas')
+router.register('etapa-fluxo', EtapaFluxoViewSet, basename='EtapasFluxo')
+router.register('esteira', EsteiraViewSet, basename='Esteira')
+router.register('fluxo-esteira', EsteiraFluxoViewSet, basename='FluxoEsteira')
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('usuario/', include('usuario.urls'), name='usuario'),
-    path('fluxo/', include('fluxoAprovacao.urls'), name='fluxoAprovacao'),
-    path('esteira/', include('esteira.urls'), name='esteira'),
+    path('api/v1/', include(router.urls)),
+    path('api/v1/grupo/<int:id>/permissoes/', GrupoPermissaoListView.as_view(), name='grupo-permissoes'),
+    path('auth/token/', obtain_auth_token, name='api_token_auth')
 ]
