@@ -1,12 +1,12 @@
 from rest_framework import serializers
-from usuario.models import Usuario, Grupo, Permissao, GrupoPermissao, UsuarioGrupo
+from usuario.models import Usuario, Grupo, Permissao
 
 class UsuarioSerializer(serializers.ModelSerializer):
     senha = serializers.CharField(write_only=True, source='password')
     
     class Meta:
         model = Usuario
-        fields = ['id', 'nome_usuario', 'nome', 'email', 'senha', 'data_criacao']
+        fields = ['id', 'nome_usuario', 'nome', 'email', 'senha', 'grupo', 'data_criacao']
         extra_kwargs = {
             'senha': {'write_only': True}
         }
@@ -58,38 +58,3 @@ class PermissaoSerializer(serializers.ModelSerializer):
         if Permissao.objects.filter(nome=value).exists():
             raise serializers.ValidationError("Este nome de permissão já está em uso.")
         return value
-
-class GrupoPermissaoSerializer(serializers.ModelSerializer):
-    grupo_nome = serializers.SerializerMethodField()
-    permissao_nome = serializers.SerializerMethodField()
-    class Meta:
-        model = GrupoPermissao
-        fields = ['id', 'grupo', 'permissao', 'grupo_nome', 'permissao_nome']
-        extra_kwargs = {
-            'grupo': {'required': True,
-                      'write_only': True},
-            'permissao': {'required': True,
-                          'write_only': True}
-        }
-
-    def get_grupo_nome(self, obj):
-        return obj.grupo.nome if obj.grupo else None
-    def get_permissao_nome(self, obj):
-        return obj.permissao.nome if obj.permissao else None
-
-class UsuarioGrupoSerializer(serializers.ModelSerializer):
-    usuario_nome = serializers.SerializerMethodField()
-    grupo_nome = serializers.SerializerMethodField()
-    class Meta:
-        model = UsuarioGrupo
-        fields = ['id', 'usuario', 'grupo', 'usuario_nome', 'grupo_nome']
-        extra_kwargs = {
-            'usuario': {'required': True,
-                        'write_only': True},
-            'grupo': {'required': True,
-                      'write_only': True}
-        }
-    def get_usuario_nome(self, obj):
-        return obj.usuario.nome if obj.usuario else None
-    def get_grupo_nome(self, obj):
-        return obj.grupo.nome if obj.grupo else None
