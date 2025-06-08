@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'fluxoAprovacao',
     'esteira',
     'aprovacao',
+    'solicitacao',
     'rest_framework',
     'rest_framework.authtoken',
 ]
